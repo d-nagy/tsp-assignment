@@ -1,2 +1,4 @@
 # Ignore all test output tourfiles
-TourFiles/*
+dev/test/TourfileA/*
+dev/test/TourfileB/*
+dev/sample_files/tourAISearchtestcase.txt
