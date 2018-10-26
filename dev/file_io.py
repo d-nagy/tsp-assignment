@@ -61,6 +61,7 @@ def export_tour(name, dir, tour, G):
 
     Args:
         filename: name of a TSP instance
+        dir: name of directory to save tourfile to
         tour: a list of distinct nodes representing a tour in the TSP instance
         G: a networkx Graph representing the TSP instance
     """
