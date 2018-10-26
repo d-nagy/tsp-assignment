@@ -1,4 +1,4 @@
-# tsp-assignment
+# tsp-assignment (AI Search assignment)
 ## Deadline
 **14:00 on Friday 14th December 2018**
 
