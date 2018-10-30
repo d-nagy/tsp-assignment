@@ -8,6 +8,7 @@ import networkx as nx
 import os
 
 INDIR = "test/city_files"
+# INDIR = "sample_files"
 
 
 def import_instance(filename):
@@ -24,7 +25,7 @@ def import_instance(filename):
     text = ""
     city = []
 
-    with open(f'{INDIR}/{filename}.txt') as f:
+    with open(f'{INDIR}/{filename}') as f:
         text = f.read()
         text = text.replace("\n", "").replace(" ", "")
 
@@ -43,7 +44,7 @@ def import_instance(filename):
         city.append(distances[j:i+j])
         j += i
 
-    print(city)  # DEBUG
+    # print(city)  # DEBUG
 
     # Make graph
     g = nx.complete_graph(size)
@@ -62,18 +63,18 @@ def export_tour(name, dir, tour, G):
     Args:
         filename: name of a TSP instance
         dir: name of directory to save tourfile to
-        tour: a list of distinct nodes representing a tour in the TSP instance
+        tour: a list of nodes representing a tour in the TSP instance
         G: a networkx Graph representing the TSP instance
     """
-    size = len(tour)
+    size = len(tour) - 1
     length = sum(
         [
-            G[tour[i]][tour[(i+1) % size]]['weight']
+            G[tour[i]][tour[i+1]]['weight']
             for i in range(size)
         ]
     )
 
-    tour_str = ','.join(map(lambda x: str(x+1), tour))
+    tour_str = ','.join(map(lambda x: str(x+1), tour[:-1]))
 
     if not os.path.exists(dir):
         print(f'Directory "{dir}" does not exist.')
@@ -94,6 +95,6 @@ if __name__ == '__main__':
     # Test
     INDIR = "sample_files"
     dir = "sample_files"
-    filename = "AISearchtestcase"
+    filename = "AISearchtestcase.txt"
     G = import_instance(filename)
-    export_tour(filename, dir, [i for i in range(8)], G)
+    export_tour(filename, dir, [i for i in range(8)] + [0], G)
