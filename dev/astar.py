@@ -6,14 +6,12 @@ A* Search implementation to solve TSP.
 Solution A
 """
 
-import itertools
 import heapq
 import networkx as nx
 import os
 from file_io import import_instance, export_tour
 
 OUTDIR = "test/TourfileA"
-counter = itertools.count()
 
 
 def search(filename):
@@ -27,18 +25,18 @@ def search(filename):
     tour = [0]
     name = os.path.splitext(filename)[0]
 
-    root = (0, 0, next(counter), tour)
+    root = (0, 0, tour)
     priority_q = [root]
 
     current = root
 
-    while len(current[3]) <= len(G.nodes()):
+    while len(current[-1]) <= len(G.nodes()):
         neighbours = get_neighbours(current, G)
         for n in neighbours:
             heapq.heappush(priority_q, n)
         current = heapq.heappop(priority_q)
 
-    print(current[3])
+    print(current[-1])
     print('cost: ', current[1])
     export_tour(name, OUTDIR, tour, G)
 
@@ -55,21 +53,21 @@ def get_neighbours(node, G):
         List of neighbours of the given node.
 
     """
-    f_n, path_cost, id, tour = node
+    f_n, path_cost, tour = node
     neighbours = []
 
     if len(tour) == len(G.nodes()):
         start_node = tour[0]
         new_tour = tour + [start_node]
         new_path_cost = path_cost + G[tour[-1]][start_node]['weight']
-        return [(new_path_cost, new_path_cost, next(counter), new_tour)]
+        return [(new_path_cost, new_path_cost, new_tour)]
 
     for city in G.nodes():
         if city not in tour:
             new_tour = tour + [city]
             new_path_cost = path_cost + G[tour[-1]][city]['weight']
             heuristic = h(new_tour, G, [i for i in G.nodes() if i not in new_tour])
-            new_node = (new_path_cost + heuristic, new_path_cost, next(counter), new_tour)
+            new_node = (new_path_cost + heuristic, new_path_cost, new_tour)
             neighbours.append(new_node)
     return neighbours
 
@@ -82,7 +80,7 @@ def h(partial_tour, G, unvisited_cities):
 
     Args:
         partial_tour: a partial tour of G
-        G: the TSP instance Graph
+        G: the TSP instance graph
         unvisited_cities: list of the unvisited_cities of G
 
     Returns:
@@ -111,5 +109,5 @@ def h(partial_tour, G, unvisited_cities):
 
 if __name__ == "__main__":
     search("NEWAISearchfile012.txt")  # Test example
-    #for filename in os.listdir("test/city_files"):
+    # for filename in os.listdir("test/city_files"):
     #    search(filename)
