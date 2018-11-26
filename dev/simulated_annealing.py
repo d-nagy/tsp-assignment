@@ -6,6 +6,7 @@ Simulated Annealing implementation to solve TSP.
 Solution B
 """
 
+import networkx
 from numpy import exp
 import os
 import random
@@ -22,11 +23,11 @@ def search(filename):
         filename: name of file containing TSP instance graph
     """
     G = import_instance(filename)
-    tour = G.nodes()
+    tour = list(G.nodes())
     name = os.path.splitext(filename)[0]
 
-    temp = 200000
-    cooling_rate = 0.0005
+    temp = 10000
+    cooling_rate = 0.9999
 
     root = [energy(tour, G), tour]
     current = root
@@ -43,10 +44,10 @@ def search(filename):
         if current[0] < best[0]:
             best = current
 
-        temp *= 1 - cooling_rate
+        temp *= cooling_rate
 
     # Quench
-    for i in range(10000):
+    for _ in range(5000):
         new_sol = swap_cities(best[1])
         new_energy = energy(new_sol, G)
 
@@ -95,10 +96,9 @@ def energy(tour, G):
 
     """
     size = len(G.nodes())
-    return sum([
-        G[tour[i]][tour[(i+1) % size]]['weight']
-        for i in range(size)
-    ])
+    return sum(
+        [G[tour[i]][tour[(i+1) % size]]['weight'] for i in range(size)]
+    )
 
 
 def accept(current_energy, new_energy, temp):
@@ -121,6 +121,6 @@ def accept(current_energy, new_energy, temp):
 
 
 if __name__ == "__main__":
-    search("NEWAISearchfile017.txt")  # Test example
+    search("NEWAISearchfile012.txt")  # Test example
     # for filename in os.listdir("test/city_files"):
     #     search(filename)
