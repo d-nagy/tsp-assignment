@@ -66,7 +66,11 @@ def get_neighbours(node, G):
         if city not in tour:
             new_tour = tour + [city]
             new_path_cost = path_cost + G[tour[-1]][city]['weight']
-            heuristic = h(new_tour, G, [i for i in G.nodes() if i not in new_tour])
+            heuristic = h(
+                new_tour,
+                G,
+                [i for i in G.nodes() if i not in new_tour]
+            )
             new_node = (new_path_cost + heuristic, new_path_cost, new_tour)
             neighbours.append(new_node)
     return neighbours
@@ -88,7 +92,8 @@ def h(partial_tour, G, unvisited_cities):
 
     """
     unvisited_subgraph = G.subgraph(unvisited_cities)
-    mst_weight = nx.minimum_spanning_tree(unvisited_subgraph, 'weight').size('weight')
+    mst = nx.minimum_spanning_tree(unvisited_subgraph, 'weight')
+    mst_weight = mst.size('weight')
 
     current_node = partial_tour[-1]
     start_node = partial_tour[0]
@@ -96,18 +101,25 @@ def h(partial_tour, G, unvisited_cities):
     if len(partial_tour) == len(G.nodes()):
         return G[current_node][start_node]['weight']
 
-    neighbours = [n for n in G.neighbors(current_node) if n not in partial_tour]
-    nearest_neighbour = min(neighbours, key=lambda n: G[current_node][n]['weight'])
+    neighbours = [n for n in G.neighbors(current_node)
+                  if n not in partial_tour]
+    nearest_neighbour = min(
+        neighbours,
+        key=lambda n: G[current_node][n]['weight']
+    )
     min_edge_next = G[current_node][nearest_neighbour]['weight']
 
     neighbours = [n for n in G.neighbors(start_node) if n not in partial_tour]
-    nearest_neighbour = min(neighbours, key=lambda n: G[start_node][n]['weight'])
+    nearest_neighbour = min(
+        neighbours,
+        key=lambda n: G[start_node][n]['weight']
+    )
     min_edge_start = G[start_node][nearest_neighbour]['weight']
 
     return min_edge_next + mst_weight + min_edge_start
 
 
 if __name__ == "__main__":
-    search("NEWAISearchfile012.txt")  # Test example
+    search("NEWAISearchfile017.txt")  # Test example
     # for filename in os.listdir("test/city_files"):
     #    search(filename)
