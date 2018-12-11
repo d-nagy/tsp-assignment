@@ -7,7 +7,7 @@ Importing and exporting data.
 import networkx as nx
 import os
 
-INDIR = 'test/city_files'
+INDIR = 'test/cityfiles'
 # INDIR = "sample_files"
 
 
