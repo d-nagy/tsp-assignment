@@ -14,7 +14,10 @@ from file_io import import_instance, export_tour
 
 
 class Ant:
+    """Ant class that will construct a TSP solution in the colony."""
+
     def __init__(self, G, start, beta, q0, rho, tau0):
+        """Initialise Ant parameters."""
         self.cities = list(G.nodes())
         self.beta = beta
         self.q0 = q0
@@ -41,9 +44,12 @@ class Ant:
         return p
 
     def _next_node(self, G):
+        if len(self.tour) == len(self.cities):
+            return self.tour[0]
+
         current_node = self.tour[-1]
         q = np.random.random()
-        unvisited = _get_unvisited_nodes()
+        unvisited = self._get_unvisited_nodes()
 
         if q <= self.q0:
             # Exploitation
@@ -72,6 +78,7 @@ class Ant:
         return G
 
     def one_step(self, G):
+        """Extend current tour length by one: travel one edge through G."""
         current_node = self.tour[-1]
         next_node = self._next_node(G)
         self.tour.append(next_node)
@@ -81,8 +88,11 @@ class Ant:
 
 
 class AntColonyTSP:
+    """Ant Colony class containing Ants to solve the TSP."""
+
     def __init__(self, G, colony_size=10, iterations=20,
                  alpha=0.1, beta=2, q0=0.9, rho=0.1):
+        """Initialise Ant and Colony parameters."""
         self.G = deepcopy(G)
         self.cities = list(self.G.nodes())
         self.colony_size = min([colony_size, len(self.cities)])
@@ -92,16 +102,15 @@ class AntColonyTSP:
         self.q0 = q0
         self.rho = rho
 
-        self.local_tau0 = 1 / (len(cities) * self._nearest_neighbour_approx())
-        self.ants = []
+        self.local_tau0 = 1 / (len(self.cities) * self._nearest_neighbour_approx())
         self.best = None
 
-        self._init_ants()
-
     def _init_ants(self):
+        self.ants = []
+
         start_cities = np.random.choice(
             self.cities,
-            colony_size,
+            self.colony_size,
             replace=False
         )
 
@@ -129,7 +138,7 @@ class AntColonyTSP:
         for _ in range(n-1):
             current_node = tour[-1]
             next_node = min(
-                [n for n in self.G[current_node] if n != current_node],
+                [n for n in self.G[current_node] if n not in tour],
                 key=lambda v: self.G[current_node][v]['weight']
             )
             tour.append(next_node)
@@ -148,17 +157,20 @@ class AntColonyTSP:
             key=lambda ant: ant.tour_length
         )
 
-        self.best = min(
-            [iteration_best, self.best],
-            key=lambda ant: ant.tour_length
-        )
+        if self.best:
+            self.best = min(
+                [iteration_best, self.best],
+                key=lambda ant: ant.tour_length
+            )
+        else:
+            self.best = iteration_best
 
     def _global_update(self):
         best_tour = self.best.tour
         best_tour_length = self.best.tour_length
-        n = len(best_tour)
+        n = len(self.cities)
 
-        best_tour_edges = [(best_tour[i], best_tour[(i+1) % n])
+        best_tour_edges = [(best_tour[i], best_tour[i+1])
                            for i in range(n)]
 
         for u, v in self.G.edges():
@@ -168,7 +180,16 @@ class AntColonyTSP:
             self.G[u][v]['phero'] = pheromone
 
     def solve(self):
+        """Perform the Ant Colony System algorithm."""
         self._init_pheromone()
-        for _ in self.iterations:
+        for _ in range(self.iterations):
+            self._init_ants()
             self._find_tours()
             self._global_update()
+
+
+if __name__ == '__main__':
+    filename = 'NEWAISearchfile012.txt'
+    G = import_instance(filename)
+    colony = AntColonyTSP(G)
+    colony.solve()
