@@ -7,7 +7,7 @@ Importing and exporting data.
 import networkx as nx
 import os
 
-INDIR = "test/city_files"
+INDIR = 'test/city_files'
 # INDIR = "sample_files"
 
 
@@ -27,14 +27,14 @@ def import_instance(filename):
 
     with open(f'{INDIR}/{filename}') as f:
         text = f.read()
-        text = text.replace("\n", "").replace(" ", "")
+        text = text.replace('\n', '').replace(' ', '')
 
     text = text.split(',')
 
-    name = next(x for x in text if "NAME" in x.upper())
+    name = next(x for x in text if 'NAME' in x.upper())
     name = name.split('=')[-1].strip()
 
-    size = next(x for x in text if "SIZE" in x.upper())
+    size = next(x for x in text if 'SIZE' in x.upper())
     size = int(text[1].split('=')[-1].strip())
 
     distances = [int(''.join([d for d in i if d.isdigit()])) for i in text[2:]]
@@ -56,16 +56,20 @@ def import_instance(filename):
     return g
 
 
-def export_tour(name, dir, tour, G):
+def export_tour(filename, dir, tour, G):
     """
     Write TSP solution to a file.
 
     Args:
-        filename: name of a TSP instance
+        filename: name of a TSP instance file
         dir: name of directory to save tourfile to
         tour: a list of nodes representing a tour in the TSP instance
         G: a networkx Graph representing the TSP instance
     """
+    name = filename.split('.')[0]
+    if name.startswith('NEW'):
+        name = name[len('NEW'):]
+
     size = len(tour) - 1
     length = sum(
         [
@@ -80,7 +84,7 @@ def export_tour(name, dir, tour, G):
         print(f'Directory "{dir}" does not exist.')
         return
 
-    with open(f'{dir}/tour{name}.txt', 'w') as f:
+    with open(f'{dir}/tour{filename}', 'w') as f:
         f.writelines(
             [
                 f'NAME = {name},\n',
@@ -93,8 +97,8 @@ def export_tour(name, dir, tour, G):
 
 if __name__ == '__main__':
     # Test
-    INDIR = "sample_files"
-    dir = "sample_files"
-    filename = "AISearchtestcase.txt"
+    INDIR = 'sample_files'
+    dir = 'sample_files'
+    filename = 'AISearchtestcase.txt'
     G = import_instance(filename)
     export_tour(filename, dir, [i for i in range(8)] + [0], G)
