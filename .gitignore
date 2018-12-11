@@ -3,4 +3,6 @@ dev/test/TourfileA/*
 dev/test/TourfileB/*
 dev/sample_files/tourAISearchtestcase.txt
 dev/__pycache__/*
+dev/test/__pycache__/*
+trace.txt
 .vscode/*
